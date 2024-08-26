@@ -11,6 +11,7 @@ class LSTMEmbedding(nn.Module):
                  embedding_dim = 256,
                  bidirectional = False,
                  depth = 1):
+
         super(LSTMEmbedding, self).__init__()
 
         self.embedding = nn.Embedding(num_embeddings=vocab_size, embedding_dim=embedding_dim)
@@ -25,16 +26,24 @@ class LSTMEmbedding(nn.Module):
 
         self.relu = nn.ReLU()
 
-        self.linear = nn.Linear(hidden_size, output_size)
+        if bidirectional:
+            self.D = 2
+        else:
+            self.D = 1
+
+        self.linear = nn.Linear(input_size*hidden_size, output_size)
 
     def forward(self, input):
         embeddings = self.embedding(input)
 
-        output, _ = self.lstm(embeddings)
+        h0 = torch.zeros(())
+        output, (h0, c0) = self.lstm(embeddings)
 
-        output = self.relu(output)
+        flattened_output = output.reshape(input.size()[0], -1)
 
-        output = self.linear(output)
+        output = self.relu(flattened_output)
+
+        output = self.linear(flattened_output)
 
         norm = torch.norm(output, p=2, dim=-1, keepdim=True)
 
@@ -45,14 +54,17 @@ class LSTMEmbedding(nn.Module):
 
 if __name__ == "__main__":
     batch_size = 2
-    sequence_length = 10
+    sequence_length = 11
     num_tokens = 5  # Number of token IDs in each sequence
-
     vocab_size = 100
 
-    model = LSTMEmbedding(3, 2, vocab_size, embedding_dim = 3)
+    model = LSTMEmbedding(
+            input_size = 11,
+            hidden_size = 6,
+            output_size = 100,
+            vocab_size = vocab_size,
+            embedding_dim = 256)
 
     token_ids = torch.randint(0, vocab_size, (batch_size, sequence_length))
 
     out = model(token_ids)
-

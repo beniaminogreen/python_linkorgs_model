@@ -49,6 +49,9 @@ def train_embeddings(config):
 
             embeddings = [model(input) for input in training_triplets]
 
+            for embedding in embeddings:
+                assert len(embedding.size()) <= 2
+
             loss = criterion(embeddings[0], embeddings[1], embeddings[2])
 
             loss.backward()
