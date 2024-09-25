@@ -45,7 +45,7 @@ def train_embeddings(config):
     while True:
         total_loss = 0
         for i in range(report_every):
-            training_triplets = dataset.random_set(100)
+            training_triplets = dataset.random_set(1000)
 
             embeddings = [model(input) for input in training_triplets]
 
@@ -105,7 +105,8 @@ tuner = tune.Tuner(
         num_samples=500,
         scheduler=ASHAScheduler(metric="loss", mode="min", max_t=300),
         search_alg=hyperopt_search,
-        time_budget_s=60*60*12
+        time_budget_s=6.5*60*60,
+        max_concurrent_trials=11
     )
 )
 

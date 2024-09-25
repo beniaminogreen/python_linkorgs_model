@@ -2,6 +2,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 
+from math import sqrt
+
 from dataset import OrganizationDataset
 from model import LSTMEmbedding
 
@@ -22,13 +24,15 @@ class HardTripletLoss(nn.Module):
 
         # Step 1, find the row that is furthest away from anchor among positive
         # embeddings
+        embedding_dim = anchor_embedding.shape[1]
+
 
         max_dist = float('-inf')
-        max_dist_index = None
+        max_dist_index = 0
         with torch.no_grad():
             for i in range(positive_embeddings.shape[0]):
                 dist = torch.norm(anchor_embedding - positive_embeddings[i, : ], p = 2).item()
-                if dist > max_dist:
+                if dist > max_dist and dist < self.margin:
                     max_dist = dist
                     max_dist_index = i
 
@@ -57,18 +61,16 @@ if __name__ == "__main__":
 
     loss = HardTripletLoss(.2)
 
-    model = LSTMEmbedding(n_letters, 2)
+    model = LSTMEmbedding(40, 2)
+
 
     anchor = model(examples[0])
     positives = model(examples[1])
     negatives = model(examples[2])
 
 
-    print(anchor)
-    print(positives[0, :].unsqueeze(0))
-    print(negatives[1, :].unsqueeze(0))
-
     print(loss(anchor, positives[0, :].unsqueeze(0), positives[0, :].unsqueeze(0)).item())
+    print(anchor.shape[1])
 
 
 

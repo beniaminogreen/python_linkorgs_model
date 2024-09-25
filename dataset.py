@@ -3,15 +3,14 @@ import random
 import torch
 
 from utils import n_letters, unicodeToAscii
+from tokenizers import Tokenizer
 
-def letterToIndex(letter):
-    return(ord(letter) - 32)
+tokenizer = Tokenizer.from_pretrained("bert-base-cased")
+
 
 def line_to_tensor(line):
-    tensor = torch.zeros(len(line))
-    for idx, letter in enumerate(line):
-        tensor[idx] = letterToIndex(letter)
-    return tensor.to(torch.int32)
+    encoded = tokenizer.encode(line)
+    return(torch.tensor(encoded.ids, dtype = torch.int32))
 
 class OrganizationDataset:
     def __init__(self):
@@ -78,4 +77,14 @@ class OrganizationDataset:
         return((anchor, positives, negatives))
 
 
+
+
+if __name__ == "__main__":
+    ds = OrganizationDataset()
+    encoded = tokenizer.encode("I can feel the magic, can you?")
+    print(encoded)
+
+    print(encoded.type_ids)
+
+    print(line_to_tensor("test"))
 

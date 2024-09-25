@@ -18,7 +18,7 @@ def run_through_model(tensor):
     modelInput = tensor.unsqueeze(0)
     out  = ort_session.run(None, {'modelInput' : to_numpy(modelInput)})
 
-    return(out[0][0, :, :])
+    return(out[0])
 
 
 print(f"pos_dist, neg_dist")

@@ -46,7 +46,6 @@ class LSTMEmbedding(nn.Module):
         output = self.linear(flattened_output)
 
         norm = torch.norm(output, p=2, dim=-1, keepdim=True)
-
         output = output / torch.clamp(norm, min=1.0)  # Ensures norm <= 1
 
         return(output)
