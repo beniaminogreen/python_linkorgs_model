@@ -57,7 +57,7 @@ pyparsing==3.1.4
 python-dateutil==2.9.0.post0
 pytz==2024.1
 PyYAML==6.0.2
-ray==2.35.0
+ray==2.52.1
 referencing==0.35.1
 regex==2024.7.24
 requests==2.32.3
